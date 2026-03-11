@@ -1,0 +1,16 @@
+{
+    "name": "antipoverti-ai-core",
+    "version": "0.1.0",
+    "description": "ANTIPOVERTI HFT Bot - Background AI & Macro Analysis Core",
+    "requires-python": ">=3.11",
+    "dependencies": [
+        "asyncio",
+        "aiohttp",
+        "pandas",
+        "numpy",
+        "chromadb",
+        "sentence-transformers",
+        "feedparser",
+        "python-dotenv"
+    ]
+}

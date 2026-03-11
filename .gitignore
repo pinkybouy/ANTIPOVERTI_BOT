@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.py[cod]
+*.class
+.venv/
+env/
+venv/
+.env
+
+# cTrader / C#
+bin/
+obj/
+.vs/
+*.user
+*.suo
+
+# Rust
+Engine/target/
+
+# Data
+data/
+*.jsonl
+*.csv
+*.db
+*.log
+harvester_error.log
+
+# Other
+.DS_Store
+Thumbs.db

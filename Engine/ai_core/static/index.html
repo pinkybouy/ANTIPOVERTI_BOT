@@ -1,0 +1,1272 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ANTIPOVERTI HFT Dashboard</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0e1a;
+            --bg-card: rgba(15, 20, 40, 0.85);
+            --bg-glass: rgba(20, 30, 60, 0.6);
+            --border: rgba(100, 140, 255, 0.15);
+            --border-glow: rgba(100, 140, 255, 0.3);
+            --text-primary: #e8ecf4;
+            --text-secondary: #8892a8;
+            --text-dim: #4a5568;
+            --accent-blue: #4facfe;
+            --accent-cyan: #00f2fe;
+            --accent-green: #00e676;
+            --accent-red: #ff5252;
+            --accent-orange: #ffab40;
+            --accent-purple: #7c4dff;
+            --gradient-bull: linear-gradient(135deg, #00e676, #00c853);
+            --gradient-bear: linear-gradient(135deg, #ff5252, #d32f2f);
+            --gradient-neutral: linear-gradient(135deg, #546e7a, #37474f);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ─── Animated Background ─────────────────── */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background:
+                radial-gradient(ellipse at 20% 50%, rgba(79, 172, 254, 0.06) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 20%, rgba(0, 242, 254, 0.04) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 80%, rgba(124, 77, 255, 0.04) 0%, transparent 50%);
+            z-index: -1;
+            animation: bgPulse 8s ease-in-out infinite alternate;
+        }
+
+        @keyframes bgPulse {
+            0% {
+                opacity: 0.6;
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
+
+        /* ─── Header ──────────────────────────────── */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--border);
+            backdrop-filter: blur(20px);
+            background: rgba(10, 14, 26, 0.9);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-title h1 {
+            font-size: 18px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 1px;
+        }
+
+        .header-title .version {
+            font-size: 11px;
+            color: var(--text-dim);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--accent-red);
+            animation: pulse 2s infinite;
+        }
+
+        .status-dot.connected {
+            background: var(--accent-green);
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                box-shadow: 0 0 0 0 rgba(0, 230, 118, 0.4);
+            }
+
+            50% {
+                box-shadow: 0 0 0 8px rgba(0, 230, 118, 0);
+            }
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        /* ─── Grid Layout ─────────────────────────── */
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            padding: 20px 24px;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        /* ─── Card Base ───────────────────────────── */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 20px;
+            backdrop-filter: blur(20px);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent-blue), transparent);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .card:hover {
+            border-color: var(--border-glow);
+        }
+
+        .card:hover::before {
+            opacity: 1;
+        }
+
+        .card-title {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--text-dim);
+            margin-bottom: 12px;
+        }
+
+        /* ─── Price Card ──────────────────────────── */
+        .price-card {
+            grid-column: span 2;
+        }
+
+        .price-main {
+            display: flex;
+            align-items: baseline;
+            gap: 12px;
+        }
+
+        .price-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 42px;
+            font-weight: 700;
+            letter-spacing: -1px;
+        }
+
+        .price-spread {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .bid-ask {
+            display: flex;
+            gap: 24px;
+            margin-top: 12px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+        }
+
+        .bid {
+            color: var(--accent-green);
+        }
+
+        .ask {
+            color: var(--accent-red);
+        }
+
+        /* ─── Signal Card ─────────────────────────── */
+        .signal-card {
+            grid-column: span 2;
+        }
+
+        .signal-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 24px;
+            border-radius: 12px;
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .signal-badge.bullish {
+            background: var(--gradient-bull);
+            color: #fff;
+        }
+
+        .signal-badge.bearish {
+            background: var(--gradient-bear);
+            color: #fff;
+        }
+
+        .signal-badge.neutral {
+            background: var(--gradient-neutral);
+            color: #bbb;
+        }
+
+        .confidence-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 3px;
+            margin-top: 12px;
+            overflow: hidden;
+        }
+
+        .confidence-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.5s ease, background 0.5s ease;
+            background: var(--accent-blue);
+        }
+
+        .confidence-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 6px;
+        }
+
+        /* ─── Metric Cards ────────────────────────── */
+        .metric-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 28px;
+            font-weight: 600;
+        }
+
+        .metric-sub {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        /* ─── OBI Gauge ───────────────────────────── */
+        .obi-gauge {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 8px;
+        }
+
+        .obi-bar-container {
+            flex: 1;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .obi-bar {
+            position: absolute;
+            top: 0;
+            height: 100%;
+            border-radius: 10px;
+            transition: all 0.4s ease;
+        }
+
+        .obi-bar.bid-side {
+            left: 50%;
+            background: var(--accent-green);
+            transform-origin: left;
+        }
+
+        .obi-bar.ask-side {
+            right: 50%;
+            background: var(--accent-red);
+            transform-origin: right;
+        }
+
+        .obi-center-line {
+            position: absolute;
+            left: 50%;
+            top: 0;
+            width: 2px;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* ─── Walls ───────────────────────────────── */
+        .walls-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 16px;
+        }
+
+        /* ─── Chart Card ──────────────────────────── */
+        .chart-card {
+            grid-column: span 4;
+            padding: 16px;
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .chart-legend {
+            display: flex;
+            gap: 16px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            color: var(--text-secondary);
+        }
+
+        .legend-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 2px;
+        }
+
+        .chart-container {
+            position: relative;
+            width: 100%;
+            height: 280px;
+            border-radius: 8px;
+            overflow: hidden;
+            background: rgba(5, 8, 18, 0.8);
+            border: 1px solid rgba(100, 140, 255, 0.08);
+        }
+
+        .chart-container canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* ─── Trade Log ───────────────────────────── */
+        .trade-card {
+            grid-column: span 4;
+        }
+
+        .trade-row {
+            display: flex;
+            gap: 24px;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        /* ─── Protection Bar ──────────────────────── */
+        .protection-bar {
+            grid-column: span 4;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 20px;
+            background: rgba(0, 230, 118, 0.05);
+            border: 1px solid rgba(0, 230, 118, 0.15);
+            border-radius: 12px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            transition: all 0.5s ease;
+        }
+
+        .protection-bar.warning {
+            background: rgba(255, 171, 64, 0.08);
+            border-color: rgba(255, 171, 64, 0.3);
+        }
+
+        .protection-bar.halted {
+            background: rgba(255, 82, 82, 0.1);
+            border-color: rgba(255, 82, 82, 0.4);
+        }
+
+        .prot-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .prot-label {
+            color: var(--text-dim);
+        }
+
+        .prot-value {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        /* ─── TPS Card ────────────────────────────── */
+        .tps-card {
+            grid-column: span 4;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 24px;
+        }
+
+        #tpsHistoryChart {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        .tps-main {
+            display: flex;
+            align-items: baseline;
+            gap: 12px;
+        }
+
+        .tps-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--accent-cyan);
+        }
+
+        .tps-label {
+            font-size: 12px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .tps-averages {
+            display: flex;
+            gap: 20px;
+        }
+
+        .tps-avg-item {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 4px;
+        }
+
+        .tps-avg-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .tps-avg-bar-container {
+            width: 40px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .tps-avg-bar {
+            height: 100%;
+            background: var(--accent-blue);
+            transition: width 0.3s ease, background 0.3s ease;
+        }
+
+        /* ─── Responsive ──────────────────────────── */
+        @media (max-width: 1200px) {
+            .dashboard {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .chart-card,
+            .trade-card,
+            .protection-bar,
+            .tps-card {
+                grid-column: span 2;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+
+            .price-card,
+            .signal-card,
+            .chart-card,
+            .trade-card,
+            .protection-bar,
+            .tps-card {
+                grid-column: span 1;
+            }
+
+            .tps-card {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 16px;
+            }
+
+            .tps-averages {
+                width: 100%;
+                justify-content: space-between;
+            }
+        }
+
+        /* ─── Animations ──────────────────────────── */
+        .flash {
+            animation: flash 0.3s ease;
+        }
+
+        @keyframes flash {
+            0% {
+                background: rgba(79, 172, 254, 0.1);
+            }
+
+            100% {
+                background: transparent;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="header-title">
+            <div class="status-dot" id="statusDot"></div>
+            <h1>ANTIPOVERTI</h1>
+            <span class="version">HFT DASHBOARD v1.0</span>
+        </div>
+        <div class="header-right">
+            <span id="clock">--:--:--</span>
+            <span id="updates">0 msg/s</span>
+        </div>
+    </div>
+
+    <!-- Dashboard Grid -->
+    <div class="dashboard">
+
+        <!-- TPS Stats Card -->
+        <div class="card tps-card">
+            <div>
+                <div class="tps-label">Trades / Sec (TPS)</div>
+                <div class="tps-main">
+                    <div class="tps-value" id="tpsCurrent">0</div>
+                    <div class="metric-sub" style="margin-top:0">LIVE</div>
+                </div>
+            </div>
+            <div class="tps-averages">
+                <div class="tps-avg-item">
+                    <div class="metric-sub">2s avg</div>
+                    <div class="tps-avg-value" id="tpsAvg2">0</div>
+                    <div class="tps-avg-bar-container">
+                        <div class="tps-avg-bar" id="tpsBar2" style="width:0%"></div>
+                    </div>
+                </div>
+                <div class="tps-avg-item">
+                    <div class="metric-sub">3s avg</div>
+                    <div class="tps-avg-value" id="tpsAvg3">0</div>
+                    <div class="tps-avg-bar-container">
+                        <div class="tps-avg-bar" id="tpsBar3" style="width:0%"></div>
+                    </div>
+                </div>
+                <div class="tps-avg-item">
+                    <div class="metric-sub">5s avg</div>
+                    <div class="tps-avg-value" id="tpsAvg5">0</div>
+                    <div class="tps-avg-bar-container">
+                        <div class="tps-avg-bar" id="tpsBar5" style="width:0%"></div>
+                    </div>
+                </div>
+                <div class="tps-avg-item">
+                    <div class="metric-sub">10s avg</div>
+                    <div class="tps-avg-value" id="tpsAvg10">0</div>
+                    <div class="tps-avg-bar-container">
+                        <div class="tps-avg-bar" id="tpsBar10" style="width:0%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Price Card -->
+        <div class="card price-card">
+            <div class="card-title">BTCUSDT Price</div>
+            <div class="price-main">
+                <div class="price-value" id="midPrice">---</div>
+                <div class="price-spread">spread: <span id="spread">---</span></div>
+            </div>
+            <div class="bid-ask">
+                <span class="bid">BID: <span id="bid">---</span></span>
+                <span class="ask">ASK: <span id="ask">---</span></span>
+            </div>
+        </div>
+
+        <!-- AI Signal Card -->
+        <div class="card signal-card">
+            <div class="card-title">AI Signal</div>
+            <div class="signal-badge neutral" id="signalBadge">◼ WAITING</div>
+            <div class="confidence-bar">
+                <div class="confidence-fill" id="confFill" style="width: 0%"></div>
+            </div>
+            <div class="confidence-label">Confidence: <span id="confValue">0%</span></div>
+        </div>
+
+        <!-- OBI Card -->
+        <div class="card">
+            <div class="card-title">Order Book Imbalance</div>
+            <div class="metric-value" id="obi5">0.000</div>
+            <div class="metric-sub">OBI₅ (5 levels)</div>
+            <div class="obi-gauge">
+                <span class="bid" style="font-size:11px">BIDS</span>
+                <div class="obi-bar-container">
+                    <div class="obi-center-line"></div>
+                    <div class="obi-bar bid-side" id="obiBidBar"></div>
+                    <div class="obi-bar ask-side" id="obiAskBar"></div>
+                </div>
+                <span class="ask" style="font-size:11px">ASKS</span>
+            </div>
+            <div class="metric-sub" style="margin-top:8px">OBI₁₀: <span id="obi10">0.000</span></div>
+        </div>
+
+        <!-- Volume Delta -->
+        <div class="card">
+            <div class="card-title">Volume Delta</div>
+            <div class="metric-value" id="volDelta" style="color:var(--text-primary)">0.000</div>
+            <div class="metric-sub">Buy - Sell volume</div>
+            <div style="margin-top:12px">
+                <div class="metric-sub">Price Δ: <span id="priceDelta">0.000</span></div>
+                <div class="metric-sub">Trades: <span id="tradeCount">0</span></div>
+            </div>
+        </div>
+
+        <!-- Bid Wall -->
+        <div class="card">
+            <div class="card-title">Bid Wall</div>
+            <div class="walls-row">
+                <span style="color:var(--accent-green);font-size:28px;font-weight:700" id="bidWall">0.00</span>
+                <span style="font-size:12px;color:var(--text-dim)">BTC</span>
+            </div>
+            <div class="metric-sub" style="margin-top:8px">Density: <span id="bidDens">0.00</span></div>
+        </div>
+
+        <!-- Ask Wall -->
+        <div class="card">
+            <div class="card-title">Ask Wall</div>
+            <div class="walls-row">
+                <span style="color:var(--accent-red);font-size:28px;font-weight:700" id="askWall">0.00</span>
+                <span style="font-size:12px;color:var(--text-dim)">BTC</span>
+            </div>
+            <div class="metric-sub" style="margin-top:8px">Density: <span id="askDens">0.00</span></div>
+        </div>
+
+        <!-- System Resources (The Brain) -->
+        <div class="card" style="border-color: var(--accent-purple);">
+            <div class="card-title" style="color:var(--accent-purple)">System Resources (Brain)</div>
+            <div class="metric-value" id="resPower" style="color:var(--accent-orange)">0.00 W</div>
+            <div class="metric-sub">Estimated Add-on Power</div>
+            <div style="margin-top:12px; display: flex; justify-content: space-between; align-items: flex-end;">
+                <div>
+                    <div class="metric-sub">CPU: <span id="resCpu"
+                            style="color:var(--text-primary); font-weight: 600;">0.0%</span></div>
+                    <div class="metric-sub">RAM: <span id="resRam"
+                            style="color:var(--text-primary); font-weight: 600;">0.0 MB</span></div>
+                </div>
+                <div style="font-size: 20px;">🧠</div>
+            </div>
+        </div>
+
+        <!-- Real-Time Chart -->
+        <div class="card chart-card">
+            <div class="chart-header">
+                <div class="card-title" style="margin-bottom:0">Live Chart (1s)</div>
+                <div class="chart-legend">
+                    <div class="legend-item">
+                        <div class="legend-dot" style="background:#4facfe"></div> Price
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-dot" style="background:rgba(0,230,118,0.15)"></div> Bid Density
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-dot" style="background:rgba(255,82,82,0.15)"></div> Ask Density
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-dot" style="background:#ffab40"></div> OBI
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-dot" style="background:#ff79c6"></div> TPS
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-dot" style="background:#00e676"></div> Buy &gt;50
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-dot" style="background:#ff5252"></div> Sell &gt;50
+                    </div>
+                </div>
+            </div>
+            <div class="chart-container">
+                <canvas id="liveChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Protection Bar -->
+        <div class="protection-bar" id="protectionBar">
+            <div class="prot-item">
+                <span>🛡</span>
+                <span class="prot-label">PROTECTION</span>
+            </div>
+            <div class="prot-item">
+                <span class="prot-label">Engine:</span>
+                <span class="prot-value" id="engineStatus">Disconnected</span>
+            </div>
+            <div class="prot-item">
+                <span class="prot-label">Messages:</span>
+                <span class="prot-value" id="msgCount">0</span>
+            </div>
+            <div class="prot-item">
+                <span class="prot-label">Latency:</span>
+                <span class="prot-value" id="latency">--ms</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ═══════════════════════════════════════════════
+        //  WebSocket Connection
+        // ═══════════════════════════════════════════════
+
+        const WS_URL = `ws://${window.location.host}/ws`;
+        let ws = null;
+        let msgCount = 0;
+        let lastMsgTime = 0;
+        let msgsPerSec = 0;
+        let msgRateCount = 0;
+
+        function connect() {
+            ws = new WebSocket(WS_URL);
+
+            ws.onopen = () => {
+                document.getElementById('statusDot').classList.add('connected');
+                document.getElementById('engineStatus').textContent = 'Connected';
+                document.getElementById('engineStatus').style.color = '#00e676';
+            };
+
+            ws.onclose = () => {
+                document.getElementById('statusDot').classList.remove('connected');
+                document.getElementById('engineStatus').textContent = 'Reconnecting...';
+                document.getElementById('engineStatus').style.color = '#ff5252';
+                setTimeout(connect, 2000);
+            };
+
+            ws.onerror = () => ws.close();
+
+            ws.onmessage = (event) => {
+                try {
+                    const d = JSON.parse(event.data);
+                    msgCount++;
+                    msgRateCount++;
+                    lastMsgTime = Date.now();
+                    updateDashboard(d);
+                } catch (e) { }
+            };
+        }
+
+        // ═══════════════════════════════════════════════
+        //  Dashboard Update
+        // ═══════════════════════════════════════════════
+
+        // ═══════════════════════════════════════════════
+        //  Chart Data Buffer (120 seconds)
+        // ═══════════════════════════════════════════════
+        const CHART_POINTS = 300; // data points to keep
+        const chartData = {
+            price: [],   // mid price
+            vDelta: [],  // volume delta
+            bidDens: [], // bid density
+            askDens: [], // ask density
+            obi: [],     // OBI5
+            tps: [],     // True Trades Per Second
+        };
+        let lastChartPush = 0;
+
+        function pushChartPoint(d) {
+            const now = Date.now();
+            // Throttle to ~3 points per second for smooth rendering
+            if (now - lastChartPush < 333) return;
+            lastChartPush = now;
+
+            chartData.price.push(d.mid || 0);
+            chartData.vDelta.push(d.vDelta || 0);
+            chartData.bidDens.push(d.bidDens || 0);
+            chartData.askDens.push(d.askDens || 0);
+            chartData.obi.push(d.obi5 || 0);
+            chartData.tps.push(trueTps || 0);
+
+            // Trim to max points
+            for (const key of Object.keys(chartData)) {
+                if (chartData[key].length > CHART_POINTS)
+                    chartData[key].shift();
+            }
+        }
+
+        // ═══════════════════════════════════════════════
+        //  Chart Renderer (Canvas)
+        // ═══════════════════════════════════════════════
+        const chartCanvas = document.getElementById('liveChart');
+        const ctx = chartCanvas.getContext('2d');
+
+        function resizeChart() {
+            const rect = chartCanvas.parentElement.getBoundingClientRect();
+            chartCanvas.width = rect.width * devicePixelRatio;
+            chartCanvas.height = rect.height * devicePixelRatio;
+            ctx.scale(devicePixelRatio, devicePixelRatio);
+        }
+        resizeChart();
+        window.addEventListener('resize', resizeChart);
+
+        function renderChart() {
+            const W = chartCanvas.width / devicePixelRatio;
+            const H = chartCanvas.height / devicePixelRatio;
+            const N = chartData.price.length;
+
+            ctx.clearRect(0, 0, W, H);
+
+            if (N < 2) {
+                ctx.fillStyle = '#4a5568';
+                ctx.font = '13px JetBrains Mono';
+                ctx.textAlign = 'center';
+                ctx.fillText('Waiting for data...', W / 2, H / 2);
+                requestAnimationFrame(renderChart);
+                return;
+            }
+
+            const padL = 60, padR = 10, padT = 10, padB = 30;
+            const cW = W - padL - padR;
+            const cH = H - padT - padB;
+            const step = cW / (CHART_POINTS - 1);
+            const offsetX = (CHART_POINTS - N) * step;
+
+            // ── Auto-scale price ──
+            let pMin = Infinity, pMax = -Infinity;
+            for (const p of chartData.price) { pMin = Math.min(pMin, p); pMax = Math.max(pMax, p); }
+            const pRange = Math.max(pMax - pMin, 0.5);
+            pMin -= pRange * 0.1; pMax += pRange * 0.1;
+
+            // ── Auto-scale volDelta ──
+            let vMax = 0;
+            for (const v of chartData.vDelta) vMax = Math.max(vMax, Math.abs(v));
+            vMax = Math.max(vMax, 0.001);
+
+            // ── Auto-scale density ──
+            let dMax = 0;
+            for (const d of chartData.bidDens) dMax = Math.max(dMax, d);
+            for (const d of chartData.askDens) dMax = Math.max(dMax, d);
+            dMax = Math.max(dMax, 0.01);
+
+            const priceY = (p) => padT + cH - ((p - pMin) / (pMax - pMin)) * cH;
+            const volBarH = cH * 0.25; // 25% of chart height for vol bars
+            const volY = padT + cH; // bottom of chart area
+
+            // ── Grid lines ──
+            ctx.strokeStyle = 'rgba(100,140,255,0.06)';
+            ctx.lineWidth = 1;
+            for (let i = 0; i < 5; i++) {
+                const y = padT + (cH / 4) * i;
+                ctx.beginPath(); ctx.moveTo(padL, y); ctx.lineTo(W - padR, y); ctx.stroke();
+                const label = (pMax - (pMax - pMin) * (i / 4)).toFixed(1);
+                ctx.fillStyle = '#4a5568';
+                ctx.font = '9px JetBrains Mono';
+                ctx.textAlign = 'right';
+                ctx.fillText(label, padL - 4, y + 3);
+            }
+
+            // ── Density areas (behind everything) ──
+            // Bid density (green fill at bottom)
+            ctx.beginPath();
+            for (let i = 0; i < N; i++) {
+                const x = padL + offsetX + i * step;
+                const h = (chartData.bidDens[i] / dMax) * volBarH;
+                if (i === 0) ctx.moveTo(x, volY);
+                ctx.lineTo(x, volY - h);
+            }
+            ctx.lineTo(padL + offsetX + (N - 1) * step, volY);
+            ctx.closePath();
+            ctx.fillStyle = 'rgba(0,230,118,0.08)';
+            ctx.fill();
+
+            // Ask density (red fill at top)
+            ctx.beginPath();
+            for (let i = 0; i < N; i++) {
+                const x = padL + offsetX + i * step;
+                const h = (chartData.askDens[i] / dMax) * volBarH;
+                if (i === 0) ctx.moveTo(x, padT);
+                ctx.lineTo(x, padT + h);
+            }
+            ctx.lineTo(padL + offsetX + (N - 1) * step, padT);
+            ctx.closePath();
+            ctx.fillStyle = 'rgba(255,82,82,0.08)';
+            ctx.fill();
+
+            // ── Volume Delta bars (removed by user request) ──
+
+            // ── OBI line (orange, scaled -1 to 1 → chart mid) ──
+            ctx.beginPath();
+            ctx.strokeStyle = 'rgba(255,171,64,0.6)';
+            ctx.lineWidth = 1.5;
+            const obiMidY = padT + cH / 2;
+            for (let i = 0; i < N; i++) {
+                const x = padL + offsetX + i * step;
+                const y = obiMidY - chartData.obi[i] * (cH * 0.3);
+                if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+            }
+            ctx.stroke();
+
+            // Zero line for OBI
+            ctx.strokeStyle = 'rgba(255,171,64,0.15)';
+            ctx.lineWidth = 1;
+            ctx.setLineDash([4, 4]);
+            ctx.beginPath(); ctx.moveTo(padL, obiMidY); ctx.lineTo(W - padR, obiMidY); ctx.stroke();
+            ctx.setLineDash([]);
+
+            // ── TPS Line (magenta, scaled dynamically from bottom) ──
+            let tpsMax = 10;
+            for (const t of chartData.tps) tpsMax = Math.max(tpsMax, t);
+            tpsMax *= 1.2; // Headroom
+
+            ctx.beginPath();
+            ctx.strokeStyle = 'rgba(255,121,198,0.7)'; // neon magenta
+            ctx.lineWidth = 1.5;
+            // TPS will span the bottom 40% of the chart
+            const tpsMaxHeight = cH * 0.4;
+            for (let i = 0; i < N; i++) {
+                const x = padL + offsetX + i * step;
+                // invert y: starts at bottom (volY), moves up
+                const y = volY - (chartData.tps[i] / tpsMax) * tpsMaxHeight;
+                if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+            }
+            ctx.stroke();
+
+            // ── Price line (main, on top) ──
+            ctx.beginPath();
+            ctx.strokeStyle = '#4facfe';
+            ctx.lineWidth = 2;
+            for (let i = 0; i < N; i++) {
+                const x = padL + offsetX + i * step;
+                const y = priceY(chartData.price[i]);
+                if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+            }
+            ctx.stroke();
+
+            // ── Trade tick annotations (TPS > 50) ──
+            ctx.font = 'bold 11px JetBrains Mono';
+            ctx.textAlign = 'left';  // we'll rotate, so left alignment starts from the pivot point
+            let lastAnnotatedIdx = -100; // avoid overlapping labels by tying logic to the data index
+            for (let i = 0; i < N; i++) {
+                const tpsVal = chartData.tps[i];
+                if (tpsVal > 50) {
+                    // Skip if too close to previous label *in the data array* (e.g. at least 5 points apart)
+                    if (i - lastAnnotatedIdx < 5) continue;
+                    lastAnnotatedIdx = i;
+
+                    const x = padL + offsetX + i * step;
+
+                    const py = priceY(chartData.price[i]);
+                    const isBuy = chartData.vDelta[i] > 0;
+
+                    ctx.save();
+                    // Alternate starting Y offset to reduce overlap based on index
+                    const yOff = (i % 2 === 0) ? -10 : 20;
+
+                    // Pivot 90 degrees
+                    ctx.translate(x, py + yOff);
+                    ctx.rotate(-Math.PI / 2); // rotate text to point upwards
+
+                    const vDeltaStr = chartData.vDelta[i] > 0 ? `+${chartData.vDelta[i].toFixed(2)}` : chartData.vDelta[i].toFixed(2);
+                    const labelStr = `${Math.round(tpsVal)} [${vDeltaStr}]`;
+
+                    ctx.fillStyle = isBuy ? '#00e676' : '#ff5252';
+                    // Draw a slight dark shadow for readability
+                    ctx.shadowColor = 'rgba(0,0,0,0.8)';
+                    ctx.shadowBlur = 4;
+                    ctx.fillText(labelStr, 0, 0); // draw at origin (which is translated)
+
+                    ctx.restore();
+                }
+            }
+
+            // Glow under price line
+            ctx.beginPath();
+            for (let i = 0; i < N; i++) {
+                const x = padL + offsetX + i * step;
+                const y = priceY(chartData.price[i]);
+                if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+            }
+            ctx.lineTo(padL + offsetX + (N - 1) * step, volY);
+            ctx.lineTo(padL + offsetX, volY);
+            ctx.closePath();
+            const grad = ctx.createLinearGradient(0, padT, 0, volY);
+            grad.addColorStop(0, 'rgba(79,172,254,0.15)');
+            grad.addColorStop(1, 'rgba(79,172,254,0)');
+            ctx.fillStyle = grad;
+            ctx.fill();
+
+            // ── Latest price dot ──
+            if (N > 0) {
+                const lx = padL + offsetX + (N - 1) * step;
+                const ly = priceY(chartData.price[N - 1]);
+                ctx.beginPath();
+                ctx.arc(lx, ly, 4, 0, Math.PI * 2);
+                ctx.fillStyle = '#4facfe';
+                ctx.fill();
+                ctx.strokeStyle = 'rgba(79,172,254,0.3)';
+                ctx.lineWidth = 8;
+                ctx.stroke();
+
+                // Price label right side
+                ctx.fillStyle = '#4facfe';
+                ctx.font = '10px JetBrains Mono';
+                ctx.textAlign = 'left';
+                ctx.fillText(chartData.price[N - 1].toFixed(2), lx + 8, ly + 3);
+            }
+
+            // ── Time axis ──
+            ctx.fillStyle = '#4a5568';
+            ctx.font = '9px JetBrains Mono';
+            ctx.textAlign = 'center';
+            const secPerPoint = 0.333;
+            for (let i = 0; i < N; i += Math.floor(30 / secPerPoint)) {
+                const x = padL + offsetX + i * step;
+                const secsAgo = Math.round((N - 1 - i) * secPerPoint);
+                ctx.fillText(`-${secsAgo}s`, x, H - 8);
+            }
+
+            requestAnimationFrame(renderChart);
+        }
+        requestAnimationFrame(renderChart);
+
+        function updateDashboard(d) {
+            // Push to chart buffer
+            pushChartPoint(d);
+
+            // Price
+            setText('midPrice', d.mid?.toFixed(2) || '---');
+            setText('spread', d.spread?.toFixed(4) || '---');
+            setText('bid', d.bid?.toFixed(2) || '---');
+            setText('ask', d.ask?.toFixed(2) || '---');
+
+            // OBI
+            const obi5 = d.obi5 || 0;
+            const obi10 = d.obi10 || 0;
+            setText('obi5', obi5.toFixed(3));
+            setText('obi10', obi10.toFixed(3));
+            setColor('obi5', obi5 > 0 ? '#00e676' : obi5 < 0 ? '#ff5252' : '#e8ecf4');
+
+            // OBI Gauge
+            const bidBar = document.getElementById('obiBidBar');
+            const askBar = document.getElementById('obiAskBar');
+            if (obi5 > 0) {
+                bidBar.style.width = Math.min(obi5 * 50, 50) + '%';
+                askBar.style.width = '0%';
+            } else {
+                bidBar.style.width = '0%';
+                askBar.style.width = Math.min(Math.abs(obi5) * 50, 50) + '%';
+            }
+
+            // Volume Delta & Trades
+            const vd = d.vDelta || 0;
+            setText('volDelta', vd.toFixed(3));
+            setColor('volDelta', vd > 0 ? '#00e676' : vd < 0 ? '#ff5252' : '#e8ecf4');
+            setText('priceDelta', (d.pDelta || 0).toFixed(3));
+            setText('tradeCount', d.trades || 0);
+
+            if (d.trades !== undefined) {
+                accumulatedTrades += d.trades;
+            }
+
+            // Walls
+            setText('bidWall', (d.bidWall || 0).toFixed(2));
+            setText('askWall', (d.askWall || 0).toFixed(2));
+            setText('bidDens', (d.bidDens || 0).toFixed(2));
+            setText('askDens', (d.askDens || 0).toFixed(2));
+
+            // AI Signal
+            const bias = d.aiBias || 'NEUTRAL';
+            const conf = d.aiConf || 0;
+            const badge = document.getElementById('signalBadge');
+            const confFill = document.getElementById('confFill');
+
+            badge.className = 'signal-badge';
+            if (bias === 'BULLISH') {
+                badge.classList.add('bullish');
+                badge.textContent = '⬆ BULLISH';
+                confFill.style.background = '#00e676';
+            } else if (bias === 'BEARISH') {
+                badge.classList.add('bearish');
+                badge.textContent = '⬇ BEARISH';
+                confFill.style.background = '#ff5252';
+            } else {
+                badge.classList.add('neutral');
+                badge.textContent = '◼ NEUTRAL';
+                confFill.style.background = '#546e7a';
+            }
+
+            confFill.style.width = (conf * 100) + '%';
+            setText('confValue', (conf * 100).toFixed(1) + '%');
+
+            // Stats
+            setText('msgCount', msgCount);
+
+            // Resources (The Brain)
+            if (d.cpu_percent !== undefined) {
+                setText('resCpu', d.cpu_percent.toFixed(1) + '%');
+                setText('resRam', d.ram_mb.toFixed(1) + ' MB');
+                setText('resPower', d.estimated_watts.toFixed(2) + ' W');
+            }
+        }
+
+        // ═══════════════════════════════════════════════
+        //  Helpers
+        // ═══════════════════════════════════════════════
+
+        function setText(id, val) {
+            const el = document.getElementById(id);
+            if (el && el.textContent !== String(val)) {
+                el.textContent = val;
+                el.classList.add('flash');
+                setTimeout(() => el.classList.remove('flash'), 300);
+            }
+        }
+
+        function setColor(id, color) {
+            const el = document.getElementById(id);
+            if (el) el.style.color = color;
+        }
+
+        // ═══════════════════════════════════════════════
+        //  TPS Tracking
+        // ═══════════════════════════════════════════════
+        const MAX_TPS_HISTORY = 60; // 60 seconds of history
+        const tpsHistory = []; // stores true Trades per second
+        let accumulatedTrades = 0;
+        let trueTps = 0;
+
+        function getAvgTps(seconds) {
+            if (tpsHistory.length === 0) return 0;
+            const slice = tpsHistory.slice(0, seconds);
+            const sum = slice.reduce((a, b) => a + b, 0);
+            return sum / slice.length;
+        }
+
+        function updateTpsUI() {
+            setText('tpsCurrent', trueTps);
+
+            const avg2 = getAvgTps(2);
+            const avg3 = getAvgTps(3);
+            const avg5 = getAvgTps(5);
+            const avg10 = getAvgTps(10);
+
+            setText('tpsAvg2', avg2.toFixed(1));
+            setText('tpsAvg3', avg3.toFixed(1));
+            setText('tpsAvg5', avg5.toFixed(1));
+            setText('tpsAvg10', avg10.toFixed(1));
+
+            // Visual bars (max TPS expected ~300 for scaling)
+            const maxExpected = 100;
+            const w2 = Math.min((avg2 / maxExpected) * 100, 100);
+            const w3 = Math.min((avg3 / maxExpected) * 100, 100);
+            const w5 = Math.min((avg5 / maxExpected) * 100, 100);
+            const w10 = Math.min((avg10 / maxExpected) * 100, 100);
+
+            function updateBar(id, width, val) {
+                const bar = document.getElementById(id);
+                bar.style.width = width + '%';
+                bar.style.background = val > 50 ? 'var(--accent-cyan)' : val > 20 ? 'var(--accent-blue)' : 'var(--text-secondary)';
+            }
+
+            updateBar('tpsBar2', w2, avg2);
+            updateBar('tpsBar3', w3, avg3);
+            updateBar('tpsBar5', w5, avg5);
+            updateBar('tpsBar10', w10, avg10);
+        }
+
+        // Clock + tick rate loop
+        setInterval(() => {
+            const now = new Date();
+            document.getElementById('clock').textContent =
+                now.toTimeString().split(' ')[0];
+
+            msgsPerSec = msgRateCount;
+            msgRateCount = 0;
+            document.getElementById('updates').textContent = msgsPerSec + ' msg/s';
+
+            // Check accumulated trades for this second
+            trueTps = accumulatedTrades;
+            accumulatedTrades = 0; // Reset accumulator for the next second
+
+            // Add to history (prepend so index 0 is newest)
+            tpsHistory.unshift(trueTps);
+            if (tpsHistory.length > MAX_TPS_HISTORY) tpsHistory.pop();
+
+            updateTpsUI();
+
+            // Latency check
+            const lat = lastMsgTime ? Date.now() - lastMsgTime : 0;
+            document.getElementById('latency').textContent =
+                lastMsgTime ? (lat < 1000 ? lat + 'ms' : 'stale') : '--ms';
+        }, 1000);
+
+        // Start
+        connect();
+    </script>
+</body>
+
+</html>

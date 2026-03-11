@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Słownik Terminów - Algorithmic Trading</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --surface-color: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent: #10b981;
+            --border: #334155;
+            --card-hover: #1f2937;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 4rem;
+            padding: 2rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .page-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(to right, #10b981, #3b82f6);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .section-title {
+            color: var(--text-main);
+            border-left: 4px solid var(--accent);
+            padding-left: 1rem;
+            margin-top: 3rem;
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .term-card {
+            background-color: var(--surface-color);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .term-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--accent);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.3s ease;
+        }
+
+        .term-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+            border-color: #475569;
+            background-color: var(--card-hover);
+        }
+
+        .term-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .term-title {
+            color: var(--accent);
+            font-weight: 600;
+            font-size: 1.15rem;
+            margin-bottom: 0.75rem;
+            display: block;
+        }
+
+        .term-desc {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            flex-grow: 1;
+        }
+
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .page-header h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header class="page-header">
+            <h1>Słownik Algorytmiczny</h1>
+            <p style="color: var(--text-muted); font-size: 1.1rem;">Kluczowe pojęcia z zakresu HFT i mechaniki rynku</p>
+        </header>
+
+        <h2 class="section-title">1. Architektura Rynku i Płynność (Order Book Dynamics)</h2>
+        <div class="grid">
+            <div class="term-card">
+                <span class="term-title">Order Book (Arkusz Zleceń)</span>
+                <p class="term-desc">Centralny rejestr wszystkich oczekujących zleceń kupna i sprzedaży dla danego
+                    instrumentu. To tu widać "intencje" rynku przed dokonaniem transakcji.</p>
+            </div>
+            <div class="term-card">
+                <span class="term-title">Bids (Oferty kupna)</span>
+                <p class="term-desc">Zlecenia kupujących ustawione poniżej aktualnej ceny rynkowej. Tworzą one tzw.
+                    "Podłogę" lub poziomy wsparcia.</p>
+            </div>
+            <div class="term-card">
+                <span class="term-title">Asks (Oferty sprzedaży)</span>
+                <p class="term-desc">Zlecenia sprzedających ustawione powyżej aktualnej ceny rynkowej. Tworzą one tzw.
+                    "Sufit" lub poziomy oporu.</p>
+            </div>
+            <div class="term-card">
+                <span class="term-title">Liquidity Wall (Mur Płynności)</span>
+                <p class="term-desc">Nienaturalnie duże skupienie wolumenu na konkretnym poziomie cenowym (np. 1.0 BTC
+                    przy średniej 0.1 BTC). Działa jako bariera psychologiczna i fizyczna dla ceny.</p>
+            </div>
+            <div class="term-card">
+                <span class="term-title">Market Depth (Głębokość Rynku)</span>
+                <p class="term-desc">Ilość zleceń dostępnych na różnych poziomach cenowych. Im większa głębokość, tym
+                    trudniej o gwałtowne skoki ceny (mniejsza zmienność).</p>
+            </div>
+            <div class="term-card">
+                <span class="term-title">Spread</span>
+                <p class="term-desc">Różnica między najwyższym Bid a najniższym Ask. W skalpingu HFT kluczowe jest, aby
+                    spread był jak najniższy, ponieważ stanowi on natychmiastowy koszt transakcyjny.</p>
+            </div>
+            <div class="term-card">
+                <span class="term-title">Support & Resistance (Wsparcie i Opór)</span>
+                <p class="term-desc">Poziomy cenowe, na których historycznie lub aktualnie (w arkuszu) dochodzi do
+                    kumulacji zleceń, co ma zatrzymać ruch ceny.</p>
+            </div>
+        </div>
+
+        <h2 class="section-title">2. Strategie i Psychologia Algorytmiczna</h2>
+        <div class="grid">
+            <div class="term-card">
+                <span class="term-title">Mean Reversion (Wall Bounce)</span>
+                <p class="term-desc">Strategia zakładająca, że cena po uderzeniu w duży mur płynności "odbije się" i
+                    powróci do średniej, zamiast go przebić.</p>
+            </div>
+            <div class="term-card">
+                <span class="term-title">Wall Reversal</span>
+                <p class="term-desc">Specyficzna odmiana handlu na odbicie, gdzie kluczowym triggerem jest fizyczny
+                    kontakt ceny z murem i natychmiastowe otwarcie pozycji w przeciwnym kierunku.</p>
+            </div>
+            <div class="term-card">
+                <span class="term-title">Scalping</span>
+                <p class="term-desc">Styl handlu polegający na otwieraniu dziesiątek lub setek transakcji dziennie w
+                    celu zgarnięcia minimalnych ruchów cenowych (często ułamków procenta).</p>
+            </div>
+            <div class="term-card">
+                <span class="term-title">Momentum Trading</span>
+                <p class="term-desc">Strategia otwierania pozycji zgodnie z aktualnym kierunkiem ruchu (np. kupno, gdy
+                    cena rośnie), często wykorzystywana przy "wybiciach" z murów.</p>
+            </div>
+            <div class="term-card">
+                <span class="term-title">Spoofing</span>
+                <p class="term-desc">Nielegalna praktyka polegająca na wystawianiu dużych murów płynności tylko po to,
+                    by przestraszyć innych graczy i skłonić ich do ruchu, a następnie usuwaniu tych zleceń tuż przed ich
+                    realizacją.</p>
+            </div>
+        </div>
+
+        <h2 class="section-title">3. Mechanika Handlu i Egzekucja</h2>
+        <div class="grid">
+            <div class="term-card">
+                <span class="term-title">Market Order (Zlecenie Rynkowe)</span>
+                <p class="term-desc">Instrukcja natychmiastowego zakupu lub sprzedaży po najlepszej dostępnej aktualnie
+                    cenie. Kluczowa w HFT dla szybkości wejścia.</p>
+            </div>
+            <div class="term-card">
+                <span class="term-title">Limit Order (Zlecenie Oczekujące)</span>
+                <p class="term-desc">Instrukcja kupna/sprzedaży tylko po określonej lub lepszej cenie. To te zlecenia
+                    tworzą "mury".</p>
+            </div>
+            <div class="term-card">
+                <span class="term-title">Take Profit (TP)</span>
+                <p class="term-desc">Automatyczne zlecenie zamykające pozycję z zyskiem po osiągnięciu określonej ceny.
+                </p>
+            </div>
+            <div class="term-card">
+                <span class="term-title">Lot Size / Volume</span>
+                <p class="term-desc">Wielkość pozycji wyrażona w jednostkach bazowych (np. BTC).</p>
+            </div>
+            <div class="term-card">
+                <span class="term-title">Volume Normalization</span>
+                <p class="term-desc">Proces dostosowywania wielkości zlecenia do wymagań brokera (np. zaokrąglanie do
+                    0.01 BTC), aby uniknąć odrzucenia zlecenia przez system.</p>
+            </div>
+            <div class="term-card">
+                <span class="term-title">Slippage (Poślizg cenowy)</span>
+                <p class="term-desc">Różnica między ceną, po której chcieliśmy wejść, a ceną, po której faktycznie
+                    otwarto zlecenie (częsta przy dużej zmienności).</p>
+            </div>
+        </div>
+
+        <h2 class="section-title">4. Technologie i Wydajność (HFT - High Frequency)</h2>
+        <div class="grid">
+            <div class="term-card">
+                <span class="term-title">Latency (Opóźnienie)</span>
+                <p class="term-desc">Czas potrzebny na dotarcie informacji z giełdy do bota i powrót zlecenia na giełdę.
+                    W HFT liczy się każda milisekunda (ms).</p>
+            </div>
+            <div class="term-card">
+                <span class="term-title">WebSocket</span>
+                <p class="term-desc">Technologia dwukierunkowej, ciągłej komunikacji, która pozwala botowi "słuchać"
+                    giełdy w czasie rzeczywistym bez ciągłego odświeżania strony.</p>
+            </div>
+            <div class="term-card">
+                <span class="term-title">Frequency (Częstotliwość)</span>
+                <p class="term-desc">Szybkość, z jaką bot sprawdza warunki rynkowe (w naszym przypadku 150 ms, czyli
+                    ponad 6 razy na sekundę).</p>
+            </div>
+            <div class="term-card">
+                <span class="term-title">Thread Safety (Bezpieczeństwo wątków)</span>
+                <p class="term-desc">Technika programowania zapobiegająca konfliktom, gdy jeden "proces" odbiera dane z
+                    giełdy, a drugi w tym samym czasie próbuje składać zlecenie.</p>
+            </div>
+            <div class="term-card">
+                <span class="term-title">Lock Contention</span>
+                <p class="term-desc">Sytuacja, w której zbyt wiele procesów próbuje uzyskać dostęp do tych samych
+                    danych, co może spowolnić bota.</p>
+            </div>
+            <div class="term-card">
+                <span class="term-title">Cooldown (Przestój)</span>
+                <p class="term-desc">Celowe wstrzymanie bota po wykonaniu akcji (np. na 10 sekund), aby zapobiec
+                    "sieczce" (overtradingowi) i dać rynkowi czas na reakcję.</p>
+            </div>
+        </div>
+
+        <h2 class="section-title">5. Analiza Danych (Data Science w Tradingu)</h2>
+        <div class="grid">
+            <div class="term-card">
+                <span class="term-title">Tick Direction</span>
+                <p class="term-desc">Najmniejsza możliwa zmiana ceny. Analiza "up-tick" (wzrost) i "down-tick" (spadek)
+                    pozwala określić chwilowe momentum.</p>
+            </div>
+            <div class="term-card">
+                <span class="term-title">Price Delta</span>
+                <p class="term-desc">Różnica między aktualną ceną a ceną sprzed ułamka sekundy. Pozwala określić, czy
+                    rynek przyspiesza, czy zwalnia.</p>
+            </div>
+            <div class="term-card">
+                <span class="term-title">Order Book Imbalance</span>
+                <p class="term-desc">Sytuacja, w której jedna strona arkusza (np. Asks) jest znacznie cięższa od
+                    drugiej, co sugeruje nadchodzący ruch ceny.</p>
+            </div>
+            <div class="term-card">
+                <span class="term-title">Engagement Tick (Tolerance)</span>
+                <p class="term-desc">Margines błędu przy określaniu, czy cena już "dotknęła" muru, czy jeszcze nie.</p>
+            </div>
+        </div>
+
+        <h2 class="section-title">6. Infrastruktura Programistyczna HFT (Low-Level Execution)</h2>
+        <div class="grid">
+            <div class="term-card">
+                <span class="term-title">Thread-Safe Architecture (Architektura Bezpieczna Wątkowo)</span>
+                <p class="term-desc">Sposób projektowania bota, w którym wiele procesów (np. odbieranie danych i
+                    składanie zleceń) nie koliduje ze sobą w pamięci RAM. Zapobiega to krytycznym błędom typu
+                    Race Condition.</p>
+            </div>
+            <div class="term-card">
+                <span class="term-title">Locking Mechanism (lock)</span>
+                <p class="term-desc">Instrukcja synchronizacji, która "zamyka drzwi" do konkretnych danych dla
+                    jednego wątku, podczas gdy inny je aktualizuje. W naszym przypadku: zapobieganie odczytowi
+                    niepełnego muru w trakcie jego nadpisywania przez WebSocket.</p>
+            </div>
+            <div class="term-card">
+                <span class="term-title">Volatile Variables</span>
+                <p class="term-desc">Zmienne, których wartość może zostać zmieniona przez inne wątki poza
+                    kontrolą bieżącego procesu. (Wspomniane przy próbie optymalizacji przesyłu ceny).</p>
+            </div>
+            <div class="term-card">
+                <span class="term-title">Thread Context Switching (Przełączanie Kontekstu)</span>
+                <p class="term-desc">Czas, jaki procesor potrzebuje na przeskoczenie z obsługi danych Binance na
+                    obsługę interfejsu cTrader. Optymalizacja tego parametru redukuje tzw. Internal Latency.</p>
+            </div>
+            <div class="term-card">
+                <span class="term-title">Asynchronous Tasks (Task.Run)</span>
+                <p class="term-desc">Uruchamianie procesów (np. pętli WebSocket) "obok" głównego silnika bota,
+                    co zapobiega zamrożeniu wykresu podczas pobierania ciężkich danych.</p>
+            </div>
+            <div class="term-card">
+                <span class="term-title">CancellationTokenSource</span>
+                <p class="term-desc">Mechanizm bezpiecznego "zabijania" procesów w tle. Pozwala na czyste
+                    wyłączenie bota bez pozostawiania otwartych, martwych połączeń z serwerem Binance.</p>
+            </div>
+        </div>
+
+        <h2 class="section-title">7. Mikrostruktura Danych i Strumieniowanie (Data Feed)</h2>
+        <div class="grid">
+            <div class="term-card">
+                <span class="term-title">WebSocket Stream (@depth5 / @trade)</span>
+                <p class="term-desc">Ciągły, nieskompresowany strumień danych. @depth5 oznacza pobieranie tylko
+                    5 najlepszych poziomów ofert (najszybsze), a @trade to każda pojedyncza transakcja wykonana
+                    na giełdzie.</p>
+            </div>
+            <div class="term-card">
+                <span class="term-title">100ms Update Interval</span>
+                <p class="term-desc">Najwyższa dostępna częstotliwość odświeżania arkusza na Binance. Dane są
+                    pakowane i wysyłane co jedną dziesiątą sekundy.</p>
+            </div>
+            <div class="term-card">
+                <span class="term-title">JSON Parsing (Deserializacja)</span>
+                <p class="term-desc">Proces "rozcinania" surowego tekstu z giełdy na liczby (cena, wolumen),
+                    które bot może zrozumieć i przeliczyć.</p>
+            </div>
+            <div class="term-card">
+                <span class="term-title">InvariantCulture (Globalizacja)</span>
+                <p class="term-desc">Wymuszenie kropki jako separatora dziesiętnego (np. 65000.50), co jest
+                    kluczowe w systemach międzynarodowych, aby bot nie pomylił 1.500 BTC z 1500 BTC.</p>
+            </div>
+            <div class="term-card">
+                <span class="term-title">Handshake SSL/TLS (Tls12 / Tls13)</span>
+                <p class="term-desc">Szyfrowane protokoły bezpieczeństwa niezbędne do zestawienia połączenia z
+                    serwerami giełdy.</p>
+            </div>
+        </div>
+
+        <h2 class="section-title">8. Parametryzacja i Kontrola Zleceń (Trade Control)</h2>
+        <div class="grid">
+            <div class="term-card">
+                <span class="term-title">NormalizeVolumeInUnits</span>
+                <p class="term-desc">Funkcja korygująca wielkość zlecenia do standardów brokera. Jeśli bot chce
+                    kupić 0.10000001 BTC, a broker pozwala na kroki co 0.01, ta funkcja zaokrągli lot do 0.10,
+                    zapobiegając odrzuceniu zlecenia.</p>
+            </div>
+            <div class="term-card">
+                <span class="term-title">RoundingMode</span>
+                <p class="term-desc">Strategia zaokrąglania (w górę, w dół lub do najbliższej wartości) przy
+                    obliczaniu wielkości pozycji lub poziomów Take Profit.</p>
+            </div>
+            <div class="term-card">
+                <span class="term-title">QuantityToVolumeInUnits</span>
+                <p class="term-desc">Przelicznik jednostek (np. z BTC na mikroloty lub jednostki kontraktu),
+                    specyficzny dla infrastruktury cTrader.</p>
+            </div>
+            <div class="term-card">
+                <span class="term-title">PipSize / PipValue</span>
+                <p class="term-desc">Najmniejsza zmiana ceny na danym symbolu (np. 0.01 dla BTC/USDT). Służy do
+                    precyzyjnego przeliczania zysku w dolarach na odległość na wykresie.</p>
+            </div>
+            <div class="term-card">
+                <span class="term-title">Execution Target Method</span>
+                <p class="term-desc">Wewnętrzna metoda platformy odpowiedzialna za fizyczne "wbicie" zlecenia do
+                    serwera brokera.</p>
+            </div>
+        </div>
+
+        <h2 class="section-title">9. Zaawansowane Zjawiska Rynkowe (Market Micro-Effects)</h2>
+        <div class="grid">
+            <div class="term-card">
+                <span class="term-title">Latency Inversion</span>
+                <p class="term-desc">Paradoks, w którym dane o arkuszu (głębokość) docierają do bota szybciej
+                    lub wolniej niż dane o ostatniej cenie (Trade), co może prowadzić do fałszywych sygnałów o
+                    "uderzeniu w mur".</p>
+            </div>
+            <div class="term-card">
+                <span class="term-title">Order Book Churn</span>
+                <p class="term-desc">Sytuacja, w której wolumen w arkuszu bardzo szybko się rotuje (zlecenia są
+                    usuwane i dodawane), mimo że cena stoi w miejscu.</p>
+            </div>
+            <div class="term-card">
+                <span class="term-title">Flash Orders</span>
+                <p class="term-desc">Zlecenia pojawiające się i znikające w czasie krótszym niż 400ms, często
+                    używane przez algorytmy do testowania płynności bez intencji ich realizacji.</p>
+            </div>
+            <div class="term-card">
+                <span class="term-title">Mean Reversion Buffer (Tolerance)</span>
+                <p class="term-desc">Margines błędu (np. 0.5 USD), który bot dodaje do ceny muru, uznając, że
+                    cena jest już "w kontakcie" ze wsparciem/oporem.</p>
+            </div>
+            <div class="term-card">
+                <span class="term-title">Toxic Flow</span>
+                <p class="term-desc">Przepływ zleceń generowany przez algorytmy, które mają przewagę
+                    informacyjną. Boty skalpujące starają się go unikać, aby nie zostać "przejechanym" przez
+                    nagłe przebicie muru.</p>
+            </div>
+        </div>
+
+        <h2 class="section-title">10. UI & UX (Monitoring Systemu)</h2>
+        <div class="grid">
+            <div class="term-card">
+                <span class="term-title">Chart Controls (AddControl)</span>
+                <p class="term-desc">Wykorzystanie natywnych elementów interfejsu (przyciski, panele) zamiast
+                    zwykłego rysowania po wykresie, co zwiększa stabilność wizualną bota.</p>
+            </div>
+            <div class="term-card">
+                <span class="term-title">StaticText Rendering</span>
+                <p class="term-desc">Najszybsza metoda wyświetlania danych na wykresie, która nie obciąża karty
+                    graficznej tak mocno jak dynamiczne obiekty (linie, strzałki).</p>
+            </div>
+            <div class="term-card">
+                <span class="term-title">Heartbeat Monitor</span>
+                <p class="term-desc">Wizualny wskaźnik (licznik pakietów lub sekund), który pozwala traderowi
+                    stwierdzić w 0.5 sekundy, czy połączenie z giełdą jest żywe.</p>
+            </div>
+        </div>
+
+        <h2 class="section-title">11. Ekosystem cTrader Automate (API & Lifecycle)</h2>
+        <div class="grid">
+            <div class="term-card">
+                <span class="term-title">Robot Attribute ([Robot])</span>
+                <p class="term-desc">Metadane definiujące bota. Określają strefę czasową (TimeZone.UTC) –
+                    kluczową dla synchronizacji z giełdami światowymi – oraz poziom uprawnień.</p>
+            </div>
+            <div class="term-card">
+                <span class="term-title">AccessRights.FullAccess</span>
+                <p class="term-desc">Specjalny tryb uprawnień cTrader. Bez niego bot jest "zamknięty w
+                    piaskownicy" i nie może nawiązać zewnętrznego połączenia z internetem (np. z Binance), co
+                    było przyczyną braku reakcji w pierwszych wersjach.</p>
+            </div>
+            <div class="term-card">
+                <span class="term-title">OnStart() vs OnStop()</span>
+                <p class="term-desc">Cykl życia bota. W OnStart inicjujemy "zasoby ciężkie" (wątki, połączenia),
+                    a w OnStop musimy je bezpiecznie "uśmiercić" (CancellationToken), aby nie zawiesić procesora
+                    po wyłączeniu bota.</p>
+            </div>
+            <div class="term-card">
+                <span class="term-title">Timer Frequency (TimeSpan)</span>
+                <p class="term-desc">Precyzyjny interwał wyzwalania akcji. Użyliśmy
+                    TimeSpan.FromMilliseconds(150), co pozwala na ominięcie standardowego, powolnego odświeżania
+                    wykresu i przejście w tryb bliski Real-Time.</p>
+            </div>
+            <div class="term-card">
+                <span class="term-title">OnTimer Event</span>
+                <p class="term-desc">Wątek UI/Główny. To tutaj musi odbywać się handel (ExecuteMarketOrder),
+                    ponieważ cTrader blokuje operacje finansowe wywoływane bezpośrednio z wątków tła (powód
+                    błędów Target Invocation).</p>
+            </div>
+        </div>
+
+        <h2 class="section-title">12. Protokoły Sieciowe i Transmisja Danych (Connectivity)</h2>
+        <div class="grid">
+            <div class="term-card">
+                <span class="term-title">Security Protocol (TLS 1.2 / 1.3)</span>
+                <p class="term-desc">Standardy szyfrowania danych. Bez wymuszenia Tls13 w kodzie, bot mógłby
+                    zostać odrzucony przez serwery Binance jako "niebezpieczny" lub przestarzały.</p>
+            </div>
+            <div class="term-card">
+                <span class="term-title">WebSocket State Management</span>
+                <p class="term-desc">Monitorowanie stanu połączenia (Open, Connecting, Aborted). Bot musi w
+                    milisekundach wykryć "zerwanie" i natychmiast wykonać Reconnect Logic, aby nie zostać
+                    "ślepym" na ruchy ceny.</p>
+            </div>
+            <div class="term-card">
+                <span class="term-title">Buffer Management (byte array)</span>
+                <p class="term-desc">Rezerwacja miejsca w pamięci RAM na przychodzące paczki danych z giełdy.
+                    Zbyt mały bufor (np. poniżej 8192 bajtów) spowodowałby ucinanie informacji o murach
+                    płynności.</p>
+            </div>
+            <div class="term-card">
+                <span class="term-title">UTF-8 Encoding</span>
+                <p class="term-desc">Standard kodowania znaków. Dane z Binance przychodzą jako "surowe bajty",
+                    które musimy zamienić na tekst zrozumiały dla człowieka (JSON).</p>
+            </div>
+        </div>
+
+        <h2 class="section-title">13. Logika Decyzyjna i Detekcja Kontaktów (Collision Logic)</h2>
+        <div class="grid">
+            <div class="term-card">
+                <span class="term-title">Engagement Tolerance (Tolerancja Kontaktu)</span>
+                <p class="term-desc">Wartość (np. 0.5 USDT), o którą cena może "chybić" mur, by bot uznał to za
+                    uderzenie. Bez tego, przy dużej zmienności, cena mogłaby przeskoczyć mur (np. z 65000.10 na
+                    64999.90), a bot by go "nie poczuł".</p>
+            </div>
+            <div class="term-card">
+                <span class="term-title">Price Delta (Momentum)</span>
+                <p class="term-desc">Różnica między _currentPrice a _lastPrice. Kluczowa dla określenia, czy
+                    cena fizycznie uderza w mur od dołu (wzrost), czy od góry (spadek). To rozróżnienie
+                    uratowało logikę bota w wersji V25.</p>
+            </div>
+            <div class="term-card">
+                <span class="term-title">Wall Aggregation</span>
+                <p class="term-desc">Proces sumowania wolumenu z kilku poziomów cenowych (np. Top 5 Bids).
+                    Pozwala odróżnić pojedyncze, małe zlecenie od prawdziwego "betonowego" muru.</p>
+            </div>
+        </div>
+
+        <h2 class="section-title">14. Arytmetyka Finansowa i Standaryzacja (Execution Engine)</h2>
+        <div class="grid">
+            <div class="term-card">
+                <span class="term-title">Normalization (Volume/Price)</span>
+                <p class="term-desc">Proces dopasowania parametrów zlecenia do wymagań brokera. Przykładowo,
+                    jeśli Twoja pozycja 0.1 BTC po przeliczeniu na "jednostki" brokera ma zbyt wiele miejsc po
+                    przecinku, funkcja Normalize przycina je, zapobiegając błędowi odrzucenia zlecenia.</p>
+            </div>
+            <div class="term-card">
+                <span class="term-title">RoundingMode.ToNearest</span>
+                <p class="term-desc">Strategia zaokrąglania. Kluczowa przy obliczaniu poziomu Take Profit, aby
+                    nie został on ustawiony "pomiędzy" tickami giełdy (co czyniłoby go niemożliwym do
+                    zrealizowania).</p>
+            </div>
+            <div class="term-card">
+                <span class="term-title">PipSize vs TickSize</span>
+                <p class="term-desc">PipSize to standardowa jednostka miary zysku w cTraderze, natomiast
+                    TickSize to najmniejszy fizyczny skok ceny na Binance (np. 0.01 USD). Ich błędna kalibracja
+                    powoduje, że bot myśli, iż zarobił 30$, a w rzeczywistości zarobił 0.30$.</p>
+            </div>
+            <div class="term-card">
+                <span class="term-title">Symbol.QuantityToVolumeInUnits</span>
+                <p class="term-desc">Funkcja mapująca ludzkie pojęcie "0.1 BTC" na techniczne "jednostki
+                    kontraktu" platformy cTrader.</p>
+            </div>
+        </div>
+
+        <h2 class="section-title">15. Stabilność i Optymalizacja Systemowa (Advanced HFT)</h2>
+        <div class="grid">
+            <div class="term-card">
+                <span class="term-title">Invariant Culture (Parsing)</span>
+                <p class="term-desc">Wymuszenie standardu amerykańskiego (kropka zamiast przecinka). Bez tego
+                    bot uruchomiony na systemie Windows z językiem polskim interpretowałby cenę "65000.50" jako
+                    błąd, co prowadziło do "wywalenia" (Crash) bota.</p>
+            </div>
+            <div class="term-card">
+                <span class="term-title">Atomic Data Swapping</span>
+                <p class="term-desc">Technika, w której podmieniamy "starą" cenę na "nową" w ułamku nanosekundy
+                    pod blokadą lock. Gwarantuje to, że bot nie podejmie decyzji na podstawie "pół-starej" i
+                    "pół-nowej" informacji.</p>
+            </div>
+            <div class="term-card">
+                <span class="term-title">Jitter (Variability)</span>
+                <p class="term-desc">Zjawisko nierównomiernych odstępów czasu między pakietami danych. Nasza
+                    pętla 150ms służy jako "stabilizator", który wygładza ten szum sieciowy.</p>
+            </div>
+            <div class="term-card">
+                <span class="term-title">Garbage Collection (GC) Pressure</span>
+                <p class="term-desc">Problem polegający na tym, że szybkie tworzenie obiektów tekstowych (JSON)
+                    zapycha pamięć RAM. Dlatego w V27/V28 przeszliśmy na bardziej wydajne metody przetwarzania
+                    ciągów znaków.</p>
+            </div>
+        </div>
+
+        <h2 class="section-title">Słownik Zagadnień "Zdarzeniowych"</h2>
+        <div class="grid" style="grid-template-columns: 1fr;">
+            <div class="term-card"
+                style="flex-direction: row; gap: 1.5rem; justify-content: space-between; align-items: center;">
+                <span class="term-title" style="margin-bottom: 0px; min-width: 200px;">Race Condition</span>
+                <p class="term-desc" style="flex-grow: unset; margin: 0;">Sytuacja, w której dwa wątki bota biją
+                    się o tę samą zmienną (naprawione przez lock).</p>
+            </div>
+            <div class="term-card"
+                style="flex-direction: row; gap: 1.5rem; justify-content: space-between; align-items: center;">
+                <span class="term-title" style="margin-bottom: 0px; min-width: 200px;">Heartbeat Pattern</span>
+                <p class="term-desc" style="flex-grow: unset; margin: 0;">Cykliczny sygnał wysyłany do Binance,
+                    by nie zerwało połączenia z powodu bezczynności.</p>
+            </div>
+            <div class="term-card"
+                style="flex-direction: row; gap: 1.5rem; justify-content: space-between; align-items: center;">
+                <span class="term-title" style="margin-bottom: 0px; min-width: 200px;">Back-off Strategy</span>
+                <p class="term-desc" style="flex-grow: unset; margin: 0;">Automatyczne wydłużanie czasu
+                    oczekiwania na ponowne połączenie po błędzie serwera.</p>
+            </div>
+            <div class="term-card"
+                style="flex-direction: row; gap: 1.5rem; justify-content: space-between; align-items: center;">
+                <span class="term-title" style="margin-bottom: 0px; min-width: 200px;">Tick-to-Trade
+                    Latency</span>
+                <p class="term-desc" style="flex-grow: unset; margin: 0;">Czas od pojawienia się muru na Binance
+                    do wysłania zlecenia przez bota.</p>
+            </div>
+        </div>
+
+    </div>
+</body>
+
+</html>
