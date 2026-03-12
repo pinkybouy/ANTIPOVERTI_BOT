@@ -13,6 +13,7 @@ import subprocess
 
 from storage import DataStorage
 from harvester import BinanceHarvester
+import config
 
 app = FastAPI(title="Binance Ticket Harvester")
 
@@ -37,12 +38,12 @@ os.makedirs(static_dir, exist_ok=True)
 app.mount("/static", StaticFiles(directory=static_dir), name="static")
 
 # Inicjalizacja komponentów
-storage = DataStorage(base_dir=os.path.join(EXE_DIR, "data"))
+storage = DataStorage(base_dir=os.path.join(EXE_DIR, config.STORAGE_DIR))
 # Konfigurujemy domyślne pary oraz strumienie zlecane przez usera
 # trade: Ticki (pojedyncze transakcje z dokładnością do ms i wolumenem)
 # diff.Depth@100ms: Zmiany arkusza (Order Book) co 100 milisekund
 # bookTicker: Najlepsza oferta kupna/sprzedaży w czasie rzeczywistym
-harvester = BinanceHarvester(storage, pairs=["btcusdt", "btcusdc"], streams=["trade", "depth@100ms", "bookTicker"])
+harvester = BinanceHarvester(storage, pairs=config.BINANCE_PAIRS, streams=config.BINANCE_STREAMS)
 
 async def watcher_task():
     while True:
@@ -132,4 +133,4 @@ if __name__ == "__main__":
     import multiprocessing
     multiprocessing.freeze_support()
     is_frozen = getattr(sys, 'frozen', False)
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=not is_frozen)
+    uvicorn.run("main:app", host=config.SERVER_HOST, port=config.SERVER_PORT, reload=not is_frozen)

@@ -15,7 +15,7 @@ import time
 import json
 
 import importlib
-from config import ENGINE_HOST, ENGINE_PORT, CHROMA_PERSIST_DIR, ACTIVE_STRATEGY
+from config import ENGINE_HOST, ENGINE_PORT, BIAS_PORT, CHROMA_PERSIST_DIR, ACTIVE_STRATEGY
 from engine_subscriber import EngineSubscriber, EngineSnapshot
 from trend_analyzer import TrendAnalyzer
 from news_engine import NewsEngine
@@ -30,7 +30,7 @@ logging.basicConfig(
 logger = logging.getLogger("ai_core")
 
 # Port for sending bias back to Rust Engine
-BIAS_PORT = 5556
+# Imporotowany z config.py
 
 
 class AICore:

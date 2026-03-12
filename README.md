@@ -31,14 +31,22 @@ Projekt podzielony jest na trzy główne moduły, które współpracują ze sob�
 
 ---
 
-## 🚀 Jak uruchomić?
+## 🚀 Uruchomienie i Konfiguracja
 
-1.  **Dane**: Uruchom `Harvester/Uruchom.bat` aby zacząć zbierać dane.
-2.  **Analiza**: Uruchom `Engine/ai_core/main.py` (lub skrypt startowy), aby aktywować silnik sygnałów.
-3.  **Trading**: Załaduj `ANTIPOVERTI_BOT` w cTrader Automate i połącz się z lokalnym Engine (port 5555).
+### 1. Konfiguracja Środowiska
+System używa zmiennych środowiskowych do zarządzania danymi wrażliwymi (np. tokeny API) i ustawieniami portów.
+1.  Skopiuj plik `.env.example` do nowego pliku `.env`.
+2.  Uzupełnij `GITHUB_TOKEN` oraz inne parametry według potrzeb.
+3.  Plik `.env` jest automatycznie ignorowany przez Git dla Twojego bezpieczeństwa.
+
+### 2. Szybki Start
+W głównym katalogu znajduje się skrypt `START_PROJECT.bat`, który automatycznie uruchamia wszystkie moduły Python w osobnych oknach terminala.
+
+1.  Uruchom `START_PROJECT.bat`.
+2.  Załaduj bota `ANTIPOVERTI_BOT` w cTrader.
 
 ## 🛡 Bezpieczeństwo
-System posiada wbudowane mechanizmy zabezpieczające kapitał (Circuit Breakers), które automatycznie przerywają handel po osiągnięciu limitów strat lub serii niepowodzeń.
+System posiada wbudowane mechanizmy zabezpieczające kapitał (Circuit Breakers), które automatycznie przerywają handel po osiągnięciu limitów strat lub serii niepowodzeń. Wszystkie klucze API powinny znajdować się wyłącznie w pliku `.env`.
 
 ---
 *Projekt rozwijany pod kątem ultra-niskich opóźnień i precyzyjnej analizy Order Flow.*
