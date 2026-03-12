@@ -28,3 +28,11 @@ harvester_error.log
 # Other
 .DS_Store
 Thumbs.db
+
+# Harvester specifics
+Harvester/data/
+Harvester/build/
+Harvester/dist/
+Harvester/__pycache__/
+Harvester/test_data/
+Harvester/*.log
